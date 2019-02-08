@@ -1,0 +1,136 @@
+<?php
+class Request
+{
+    protected $errors = [];
+	protected $values = [];
+    protected $cleanPostParams = [];
+    public function isGet(): bool
+    {
+        return $_SERVER['REQUEST_METHOD'] === "GET";
+    }
+    public function isPost(): bool
+    {
+        return $_SERVER['REQUEST_METHOD'] === "POST";
+    }
+    public function required($name)
+    {
+        if(empty($this->getFromPostWithClean($name))) {
+            $this->errors[$name][] = 'Поле обязательно для заполнения';
+        }
+        return $this;
+    }
+    public function max($name, $max)
+    {
+        if(mb_strlen($this->getFromPostWithClean($name)) > $max) {
+            $this->errors[$name][] = 'Максимальное кол-во симаолов ' . $max;
+        }
+        return $this;
+    }
+    public function min($name, $min)
+    {
+        if(mb_strlen($this->getFromPostWithClean($name)) < $min) {
+            $this->errors[$name][] = 'Минимальное кол-во симаолов ' . $min;
+        }
+        return $this;
+    }
+    public function email($name)
+    {
+        if (!filter_var($this->getFromPostWithClean($name), FILTER_VALIDATE_EMAIL)) {
+        // if (preg_match("/^(?:[a-z0-9]+(?:[-_.]?[a-z0-9]+)?@[a-z0-9_.-]+(?:\.?[a-z0-9]+)?\.[a-z]{2,5})$/i", filter_var($this->getFromPostWithClean($name)))) {
+            $this->errors[$name][] = 'Не верный e-mail';
+        }
+        return $this;
+    }
+	public function views($name)
+	{
+		if (!filter_var($this->getFromPostWithClean($name), FILTER_VALIDATE_INT) || 
+			$this->getFromPostWithClean($name) < 0 ||
+			$this->getFromPostWithClean($name) > PHP_INT_MAX*2
+		
+		) {
+			$this->errors[$name][] = 'Не верное число просмотров';
+		}
+		return $this;
+	}
+	public function isActualDate($name)
+	{
+		$today = date('Y-m-d');
+		$publicationDate = $_POST[$name];
+		
+		if($publicationDate < $today) {
+			$this->errors[$name][] = 'Дата публикации не должна быть раньше текущей даты';
+		}
+		
+		return $this;
+	}
+	public function publishOnMain($name)
+	{
+		if(!$_POST['publish_in_index'] == 'yes' && !$_POST['publish_in_index'] == 'no') {
+			$this->errors[$name][] = 'Необходимо выбрать: публиковать на главной или нет';
+		}
+		return $this;
+	}
+	public function category($name)
+	{
+		if($_POST['category'] == '') {
+			$this->errors[$name][] = 'Выберие категорию';
+		}
+		
+		return $this;
+	}
+	public function categoryArray($name, $array)
+	{
+		if(!in_array($_POST['category'], $array)) {
+			$this->errors[$name][] = 'Выберие категорию';
+		}
+		
+		return $this;
+	}
+	public function saveValue($name)
+	{
+		echo $_POST[$name];
+	}
+	
+	public function saveSelect($name)
+	{
+		return $_POST[$name];
+	}
+
+	
+
+    public function isValid(): bool
+    {
+        return !count($this->errors);
+    }
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    /*
+     * Получение и очистка из поста.
+     */
+    public function getFromPostWithClean($name)
+    {
+        if(isset($this->cleanPostParams[$name]) && $this->cleanPostParams[$name]) {
+            return $this->cleanPostParams[$name];
+        }else {
+            $value = $_POST[$name];
+            $value = trim($value);
+            $value = htmlspecialchars($value);
+            $this->cleanPostParams[$name] = $value;
+            return $value;
+        }
+    }
+    // required
+    // array
+    // between
+    // e-mail
+    // greaterThan
+    // in
+    // lessThan
+    // max
+    // min
+    // notIn
+    // string
+}
