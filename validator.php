@@ -50,10 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $isValid = false;
         $errors['publish_in_index'] = 'Необходимо выбрать: публиковать на главной или нет';
     }
-    /*if($category == '') {
+    if($category == 'Выберете категорию из списка...') {
         $isValid = false;
         $errors['category'] = 'Выберие категорию';
-    }*/
+    }
 
     echo json_encode([
         'status' => $isValid,
