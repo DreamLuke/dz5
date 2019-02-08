@@ -159,14 +159,23 @@
             <div class="form-group row">
                 <label for="category" class="col-md-2 col-form-label">Категория</label>
                 <div class="col-md-10">
-                    <select id="category" class="form-control" name="category" :class="{'is-invalid': errors['category']}">
+                    <!-- <select id="category" class="form-control" name="category" :class="{'is-invalid': errors['category']}"> -->
                         <!-- <option v-for="category in categories" v-model="category">{{category}}</option> -->
 
-                        <option disabled selected>Выберете категорию из списка..</option>
+                        <!-- <option disabled selected>Выберете категорию из списка..</option>
                         <option value="1">Спорт</option>
                         <option value="2">Культура</option>
                         <option value="3">Политика</option>
-                    </select>
+                    </select> -->
+
+
+                    <select id="category" class="form-control" name="category" :class="{'is-invalid': errors['category']}" v-model="category">
+                    	<option disabled selected>Выберете категорию из списка...</option>
+    					<option value="1">Спорт</option>
+                        <option value="2">Культура</option>
+                        <option value="3">Политика</option>
+					</select>
+
                     <div class="invalid-feedback">
                         {{ errors['category'] ? errors['category'] : '' }}
                     </div>
@@ -210,8 +219,7 @@
             email: null,
             views: null,
             date: null,
-            // category: null,
-            // categories: ['Выберете категорию из списка..', 'Спорт', 'Культура', 'Политика'],
+            category: 'Выберете категорию из списка...',
 
             isValid: null,
             errors: [],
